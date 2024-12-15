@@ -8,12 +8,6 @@ const port = 3000;
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// Directory to store generated PDFs
-const pdfDirectory = path.join(__dirname, 'generated_pdfs');
-if (!fs.existsSync(pdfDirectory)) {
-    fs.mkdirSync(pdfDirectory); // Ensure directory exists
-}
-
 app.post('/generate-pdf', (req, res) => {
     const data = req.body; // Get data from the POST request body
 
@@ -118,23 +112,15 @@ app.post('/generate-pdf', (req, res) => {
 
     const pdfDoc = printer.createPdfKitDocument(documentDefinition);
 
-    // Use the person's name in the file name
-    const fileName = `${data.person.name.replace(/\s+/g, '_')}_transactions.pdf`;
-    const filePath = path.join(pdfDirectory, fileName);
+    // Set response headers to prompt a download in the browser
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="transactions.pdf"');
 
-    // Save the PDF to the file system
-    pdfDoc.pipe(fs.createWriteStream(filePath));
+    // Pipe the PDF document directly to the response
+    pdfDoc.pipe(res);
     pdfDoc.end();
-
-    // After the PDF is written, return the URL for downloading it
-    pdfDoc.on('end', () => {
-        const fileUrl = `https://api-kiuw.onrender.com/generate-pdf/generated_pdfs/${fileName}`;
-        res.json({ downloadUrl: fileUrl }); // Send the download URL in the response
-    });
 });
 
-app.use('/generated_pdfs', express.static(pdfDirectory)); // Serve generated PDFs via static middleware
-
 app.listen(port, '0.0.0.0', () => {
-    console.log(`Server running on http://0.0.0.0:${port}`)
+    console.log(`Server running on http://0.0.0.0:${port}`);
 });
