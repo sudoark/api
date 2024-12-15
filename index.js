@@ -128,7 +128,7 @@ app.post('/generate-pdf', (req, res) => {
 
     // After the PDF is written, return the URL for downloading it
     pdfDoc.on('end', () => {
-        const fileUrl = `http://192.168.1.3:${port}/generated_pdfs/${fileName}`;
+        const fileUrl = `https://api-kiuw.onrender.com/generate-pdf/generated_pdfs/${fileName}`;
         res.json({ downloadUrl: fileUrl }); // Send the download URL in the response
     });
 });
