@@ -90,11 +90,7 @@ app.post('/generate-pdf', (req, res) => {
                 alignment: 'center',
                 margin: [0, 10, 0, 20]
             },
-            { image: './logo.jpg', alignment: 'right', width: 50, margin: [0, 50, 0, 0] },
-            {
-                text: 'Signature',
-                style: 'signature',
-            }
+            { image: './signature.jpg', alignment: 'right', width: 50, margin: [0, 50, 0, 0] }
         ],
         styles: {
             orgName: {
