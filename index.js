@@ -27,12 +27,22 @@ app.post('/generate-pdf', (req, res) => {
 
     const printer = new pdfMake(fonts);
 
+    // Calculate totals
+    const totals = data.transactions.reduce((acc, transaction) => {
+        if (transaction.type === 'credit') {
+            acc.totalCredit += transaction.amount;
+        } else if (transaction.type === 'debit') {
+            acc.totalDebit += Math.abs(transaction.amount); // Debit amounts stored as negative
+        }
+        return acc;
+    }, { totalCredit: 0, totalDebit: 0 });
+
     // Define document structure
     const documentDefinition = {
         content: [
             {
                 columns: [
-                    { image: './logo.jpg', width: 50 }, // Use absolute path for image
+                    { image: './logo.jpg', width: 50 },
                     { text: 'MSV Public School Rambha', style: 'orgName', alignment: 'center' },
                     ''
                 ],
@@ -45,33 +55,40 @@ app.post('/generate-pdf', (req, res) => {
                     headerRows: 1,
                     widths: ['20%', '35%', '20%', '20%'],
                     body: [
+                        // Header row
                         [
                             { text: 'Date', bold: true },
                             { text: 'Description', bold: true },
                             { text: 'Credit', bold: true },
                             { text: 'Debit', bold: true },
                         ],
+                        // Transaction rows
                         ...data.transactions.map((transaction, index) => {
                             const credit = transaction.type === 'credit' ? transaction.amount.toFixed(2) : '';
                             const debit = transaction.type === 'debit' ? (-transaction.amount).toFixed(2) : '';
-                            const runningBalance = data.transactions
-                                .slice(0, index + 1)
-                                .reduce((acc, curr) => acc + curr.amount, 0);
                             return [
                                 transaction.date,
                                 transaction.description,
                                 { text: credit, color: 'green' },
                                 { text: debit, color: 'red' }
                             ];
-                        })
+                        }),
+                        // Row to show totals
+                        [
+                            { text: 'Total', bold: true, alignment: 'right', colSpan: 2 }, {},
+                            { text: totals.totalCredit.toFixed(2), bold: true, color: 'green' },
+                            { text: totals.totalDebit.toFixed(2), bold: true, color: 'red' }
+                        ]
                     ]
                 },
-                margin: [0, 0, 0, 20]
+                margin: [0, 0, 0, 10]
             },
+            // Closing balance section
             {
-                text: `Total Balance: ${data.balance.current_balance.toFixed(2)} ${data.balance.currency}`,
-                style: 'total',
-                color: data.balance.current_balance >= 0 ? 'green' : 'red'
+                text: `Closing Balance: ${data.balance.current_balance.toFixed(2)} ${data.balance.currency}`,
+                style: 'closingBalance',
+                alignment: 'center',
+                margin: [0, 10, 0, 20]
             },
             { image: './logo.jpg', alignment: 'right', width: 50, margin: [0, 50, 0, 0] },
             {
@@ -91,11 +108,10 @@ app.post('/generate-pdf', (req, res) => {
                 alignment: 'center',
                 margin: [0, 0, 0, 20]
             },
-            total: {
+            closingBalance: {
                 fontSize: 14,
                 bold: true,
-                alignment: 'right',
-                margin: [0, 20, 0, 0]
+                alignment: 'center',
             },
             signature: {
                 alignment: 'right',
