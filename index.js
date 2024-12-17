@@ -43,14 +43,13 @@ app.post('/generate-pdf', (req, res) => {
             {
                 table: {
                     headerRows: 1,
-                    widths: ['20%', '30%', '15%', '15%', '20%'],
+                    widths: ['20%', '35%', '20%', '20%'],
                     body: [
                         [
                             { text: 'Date', bold: true },
                             { text: 'Description', bold: true },
                             { text: 'Credit', bold: true },
                             { text: 'Debit', bold: true },
-                            { text: 'Balance', bold: true }
                         ],
                         ...data.transactions.map((transaction, index) => {
                             const credit = transaction.type === 'credit' ? transaction.amount.toFixed(2) : '';
@@ -62,8 +61,7 @@ app.post('/generate-pdf', (req, res) => {
                                 transaction.date,
                                 transaction.description,
                                 { text: credit, color: 'green' },
-                                { text: debit, color: 'red' },
-                                { text: runningBalance.toFixed(2), color: runningBalance >= 0 ? 'green' : 'red' }
+                                { text: debit, color: 'red' }
                             ];
                         })
                     ]
