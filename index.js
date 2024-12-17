@@ -78,19 +78,21 @@ app.post('/generate-pdf', (req, res) => {
                             { text: 'Total', bold: true, alignment: 'right', colSpan: 2 }, {},
                             { text: totals.totalCredit.toFixed(2), bold: true, color: 'green' },
                             { text: totals.totalDebit.toFixed(2), bold: true, color: 'red' }
+                        ],
+                        // Row to show closing balance
+                        [
+                            { text: 'Closing Balance', bold: true, alignment: 'right', colSpan: 3 }, {}, {},
+                            { text: data.balance.current_balance.toFixed(2) + ' ' + data.balance.currency, bold: true, color: 'blue' }
                         ]
                     ]
                 },
                 margin: [0, 0, 0, 10]
             },
-            // Closing balance section
+            { image: './logo.jpg', alignment: 'right', width: 50, margin: [0, 50, 0, 0] },
             {
-                text: `Closing Balance: ${data.balance.current_balance.toFixed(2)} ${data.balance.currency}`,
-                style: 'closingBalance',
-                alignment: 'center',
-                margin: [0, 10, 0, 20]
-            },
-            { image: './signature.jpg', alignment: 'right', width: 50, margin: [0, 50, 0, 0] }
+                text: 'Signature',
+                style: 'signature',
+            }
         ],
         styles: {
             orgName: {
