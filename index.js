@@ -88,7 +88,7 @@ app.post('/generate-pdf', (req, res) => {
                 },
                 margin: [0, 0, 0, 10]
             },
-            { image: './signature.jpg', alignment: 'right', width: 50, margin: [0, 50, 0, 0] }
+            { image: './signature.jpg', alignment: 'right', width: 50, margin: [0, 50, 0, 0] },
             { image: './IMG-20250330-WA0002.jpg', alignment: 'left', width: 200, margin: [0, 50, 0, 0] }
         ],
         styles: {
